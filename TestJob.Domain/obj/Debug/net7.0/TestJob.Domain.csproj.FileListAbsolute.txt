@@ -1,0 +1,14 @@
+D:\C_Project\TestJob\TestJob.Domain\bin\Debug\net7.0\TestJob.Domain.deps.json
+D:\C_Project\TestJob\TestJob.Domain\bin\Debug\net7.0\TestJob.Domain.dll
+D:\C_Project\TestJob\TestJob.Domain\bin\Debug\net7.0\TestJob.Domain.pdb
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.csproj.AssemblyReference.cache
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.AssemblyInfoInputs.cache
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.AssemblyInfo.cs
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.csproj.CoreCompileInputs.cache
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.dll
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\refint\TestJob.Domain.dll
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.pdb
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\ref\TestJob.Domain.dll
+D:\C_Project\TestJob\TestJob.Domain\bin\Debug\net7.0\TestJob.Domain.runtimeconfig.json
+D:\C_Project\TestJob\TestJob.Domain\obj\Debug\net7.0\TestJob.Domain.genruntimeconfig.cache
