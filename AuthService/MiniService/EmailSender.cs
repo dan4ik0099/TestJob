@@ -1,15 +1,11 @@
-using System.Net;
-using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace AuthService.MiniService;
 
-public class EmailSender: IEmailSender
+public class EmailSender : IEmailSender
 {
-   
     public async Task SendEmailAsync(string userEmail, string subject, string confirmationLink)
     {
         subject = "ConfirmEmail";
@@ -20,7 +16,6 @@ public class EmailSender: IEmailSender
         msg.Body = new TextPart(MimeKit.Text.TextFormat.Html)
         {
             Text = confirmationLink
-            
         };
         using (var smtpClient = new SmtpClient())
         {
@@ -29,7 +24,5 @@ public class EmailSender: IEmailSender
             await smtpClient.SendAsync(msg);
             await smtpClient.DisconnectAsync(true);
         }
-        
     }
-    
 }

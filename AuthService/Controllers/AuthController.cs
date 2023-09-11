@@ -1,11 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using AuthService.MiniService;
 using AutoMapper;
-using IdentityModel;
-using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,10 +35,6 @@ public class AuthController : ControllerBase
         _emailSender = emailSender;
         _signInManager = signInManager;
         _mapper = mapper;
-        if (_roleManager.RoleExistsAsync("User").Result) return;
-        _roleManager.CreateAsync(new Role("User")).Wait();
-        if (_roleManager.RoleExistsAsync("DraftUser").Result) return;
-        _roleManager.CreateAsync(new Role("DraftUser")).Wait();
     }
 
     [HttpPost]
@@ -56,15 +48,22 @@ public class AuthController : ControllerBase
         };
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
-        if (!result.Succeeded) return BadRequest();
+        if (!result.Succeeded)
+        {
+            return BadRequest();
+        }
+
         var result1 = await _userManager.AddToRoleAsync(user, "DraftUser");
-        if (!result1.Succeeded) return BadRequest();
+        if (!result1.Succeeded)
+        {
+            return BadRequest();
+        }
+
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var confirmationLink =
             Url.Action(nameof(ConfirmEmail), "Auth", new { userId = user.Id, code = token }, Request.Scheme);
         await _emailSender.SendEmailAsync(user.Email, "gg", confirmationLink);
         return Ok();
-
     }
 
     private static string GetToken(User user, IEnumerable<Claim> claimsCollection)
@@ -85,7 +84,6 @@ public class AuthController : ControllerBase
             signingCredentials: signingCredentials);
         var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-
         return token;
     }
 
@@ -96,18 +94,14 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByIdAsync(userId);
         var result = await _userManager.ConfirmEmailAsync(user, code);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            await _userManager.RemoveFromRoleAsync(user, "DraftUser");
-            await _userManager.AddToRoleAsync(user, "User");
-            return Ok("Ваш адрес электронной почты успешно подтвержден.");
-        }
-        else
-        {
-            // Обработка ошибок подтверждения
             return BadRequest(result);
         }
-        
+        await _userManager.RemoveFromRoleAsync(user, "DraftUser");
+        await _userManager.AddToRoleAsync(user, "User");
+        return Ok("Ваш адрес электронной почты успешно подтвержден.");
+
     }
 
 
@@ -120,14 +114,15 @@ public class AuthController : ControllerBase
         {
             return Unauthorized();
         }
-        var result = await _signInManager.PasswordSignInAsync(user, signInRequest.Password, false, false);
-        if (result.Succeeded)
-        {
-            IEnumerable<Claim> claims = await _userManager.GetClaimsAsync(user);
-            return Ok(GetToken(user, claims));
-        }
 
-        return BadRequest();
+        var result = await _signInManager.PasswordSignInAsync(user, signInRequest.Password, false, false);
+        if (!result.Succeeded)
+        {
+            return BadRequest();
+        }
+        IEnumerable<Claim> claims = await _userManager.GetClaimsAsync(user);
+        return Ok(GetToken(user, claims));
+
     }
 
     [HttpPost]
@@ -136,11 +131,12 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ChangeEmail([FromBody] string newEmail)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var user = await _userManager.FindByIdAsync(userId);
+        var user = await _userManager.FindByIdAsync(userId!);
         if (user is null)
         {
             return Unauthorized();
         }
+
         user.Email = newEmail;
         user.EmailConfirmed = false;
         await _userManager.UpdateAsync(user);
@@ -151,8 +147,8 @@ public class AuthController : ControllerBase
             Url.Action(nameof(ConfirmEmail), "Auth", new { userId = user.Id, code = token }, Request.Scheme);
         await _emailSender.SendEmailAsync(user.Email, "gg", confirmationLink);
         return Ok();
-
     }
+
     [HttpGet]
     [Route(("info"))]
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -164,9 +160,7 @@ public class AuthController : ControllerBase
         {
             return Unauthorized();
         }
-        var g = _mapper.Map<InfoUserResponse>(user);
-       
-        return Ok(g);
-
+        var response = _mapper.Map<InfoUserResponse>(user);
+        return Ok(response);
     }
 }

@@ -1,10 +1,6 @@
-using System.Configuration;
-using Microsoft.Extensions.Configuration;
-
 using AuthService.MiniService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,8 +9,6 @@ using TestJob.Domain.Entity;
 using TestJob.Domain.MapProfile;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -48,15 +42,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
     , new MySqlServerVersion(new Version(8, 0, 34))));
 ;
 
-builder.Services.AddIdentity<User,Role>(options =>
-    {
-        options.SignIn.RequireConfirmedEmail = true;
-    }) 
+builder.Services.AddIdentity<User, Role>(options => { options.SignIn.RequireConfirmedEmail = true; })
     .AddRoleManager<RoleManager<Role>>()
     .AddUserManager<UserManager<User>>()
     .AddSignInManager<SignInManager<User>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders(); 
+    .AddDefaultTokenProviders();
 builder.Services.AddTransient<EmailSender>();
 builder.Services.AddAuthentication(options =>
 {
@@ -67,15 +58,15 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-         ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://localhost:7144/", 
-                    ValidAudience = "https://localhost:7144/", 
-                    IssuerSigningKey = new SymmetricSecurityKey("your_secret_key_that_is_long_enoughiahhazsxiogvhoiaigvhopiahgop"u8.ToArray())
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "https://localhost:7144/",
+        ValidAudience = "https://localhost:7144/",
+        IssuerSigningKey =
+            new SymmetricSecurityKey("your_secret_key_that_is_long_enoughiahhazsxiogvhoiaigvhopiahgop"u8.ToArray())
     };
-
 });
 
 builder.Services.AddAutoMapper(typeof(InfoUserProfile));
@@ -83,7 +74,6 @@ builder.Services.AddAutoMapper(typeof(InfoUserProfile));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

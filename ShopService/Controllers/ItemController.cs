@@ -19,6 +19,7 @@ public class ItemController : ControllerBase
     private readonly ApplicationDbContext _applicationDbContext;
     private readonly EmailSender _emailSender;
     private readonly IMapper _autoMapper;
+
     public ItemController(ApplicationDbContext applicationDbContext, EmailSender emailSender, IMapper autoMapper)
     {
         _applicationDbContext = applicationDbContext;
@@ -28,12 +29,10 @@ public class ItemController : ControllerBase
 
     [HttpGet]
     [Route("items")]
-    
     public async Task<IActionResult> GetAllItems()
     {
         var items = await _applicationDbContext.Items.ToListAsync();
         var resultItems = _autoMapper.Map<List<ItemCompactResponse>>(items);
-
         return Ok(resultItems);
     }
 
@@ -42,13 +41,14 @@ public class ItemController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> GetItemById([FromQuery] Guid id)
     {
-        var item = await _applicationDbContext.Items.FirstOrDefaultAsync(x=>x.Id==id);
-        if (item != null)
+        var item = await _applicationDbContext.Items.FirstOrDefaultAsync(x => x.Id == id);
+        if (item is null)
         {
-            return Ok(item);
+            return NotFound();
+           
         }
 
-        return NotFound();
+        return Ok(item);
     }
 
     [HttpPost]
@@ -56,32 +56,41 @@ public class ItemController : ControllerBase
     [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> AddToCart([FromBody] ItemIdCountRequest x)
     {
-        if (x.Count > 0)
+        if (x.Count <= 0)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(userIdClaim, out var userId))
-            {
-                return BadRequest();
-            }
-            var user = await _applicationDbContext.Users.FirstOrDefaultAsync(user=>user.Id == userId);
-            if (user == null) {return BadRequest();}
-            var item = await _applicationDbContext.Items.FirstOrDefaultAsync(item=>item.Id==x.Id);
-            if (item == null) {return BadRequest();}
-            var cartUnit = new CartUnit
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                ItemId = item.Id,
-                Cost = item.Cost,
-                Count = x.Count,
-                TotalCost = item.Cost* x.Count
-            };
-            _applicationDbContext.CartUnits.Add(cartUnit);
-            await _applicationDbContext.SaveChangesAsync();
-            return Ok(cartUnit);
+            return BadRequest();
         }
 
-        return BadRequest();
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (Guid.TryParse(userIdClaim, out var userId))
+        {
+            return BadRequest();
+        }
+
+        var user = await _applicationDbContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+        if (user is null)
+        {
+            return BadRequest();
+        }
+
+        var item = await _applicationDbContext.Items.FirstOrDefaultAsync(item => item.Id == x.Id);
+        if (item is null)
+        {
+            return BadRequest();
+        }
+
+        var cartUnit = new CartUnit
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            ItemId = item.Id,
+            Cost = item.Cost,
+            Count = x.Count,
+            TotalCost = item.Cost * x.Count
+        };
+        _applicationDbContext.CartUnits.Add(cartUnit);
+        await _applicationDbContext.SaveChangesAsync();
+        return Ok(cartUnit);
     }
 
     [HttpDelete]
@@ -90,26 +99,39 @@ public class ItemController : ControllerBase
     public async Task<IActionResult> DeleteFromCart([FromBody] Guid idCartUnit)
     {
         var cartUnit = await _applicationDbContext.CartUnits.FirstOrDefaultAsync(unit => unit.Id == idCartUnit);
-        if (cartUnit==null) {return NotFound();}
+        if (cartUnit is null)
+        {
+            return NotFound();
+        }
+
         _applicationDbContext.CartUnits.Remove(cartUnit);
         await _applicationDbContext.SaveChangesAsync();
         return Ok();
     }
+
     [HttpPost]
     [Route("update-count-cart")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> UpdateCountCart([FromBody] ItemIdCountRequest x)
     {
-        if (x.Count <= 0) {return BadRequest();}
+        if (x.Count <= 0)
+        {
+            return BadRequest();
+        }
+
         var cartUnit = await _applicationDbContext.CartUnits.FirstOrDefaultAsync(unit => unit.Id == x.Id);
-        if (cartUnit == null) {return NotFound();}
+        if (cartUnit == null)
+        {
+            return NotFound();
+        }
+
         cartUnit.Count = x.Count;
         cartUnit.TotalCost = x.Count * cartUnit.Cost;
-        _applicationDbContext.CartUnits.Update(cartUnit); 
+        _applicationDbContext.CartUnits.Update(cartUnit);
         await _applicationDbContext.SaveChangesAsync();
         return Ok(cartUnit);
-
     }
+
     [HttpGet]
     [Route("create-order")]
     [Authorize(AuthenticationSchemes = "Bearer")]
@@ -120,10 +142,14 @@ public class ItemController : ControllerBase
         {
             return BadRequest();
         }
+
         var user = await _applicationDbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         var cartUnits = await _applicationDbContext.CartUnits.Where(x => x.UserId == userId)
             .Include(cartUnit => cartUnit.Item).ToListAsync();
-        if (cartUnits.IsNullOrEmpty()) {return NotFound();}
+        if (cartUnits.IsNullOrEmpty())
+        {
+            return NotFound();
+        }
 
         decimal totalCost = 0;
         var order = new Order
@@ -148,17 +174,15 @@ public class ItemController : ControllerBase
             _applicationDbContext.CartUnits.Remove(x);
             totalCost += x.TotalCost;
             orderUnits.Add(orderUnit);
-            
         }
 
         order.TotalCost = totalCost;
         await _applicationDbContext.Orders.AddAsync(order);
-        var infoOrder = $"{order.User.UserName} Ваш заказ {order.Id} на сумму {Math.Round(order.TotalCost, 2)} сформирован {order.Date}";
+        var infoOrder =
+            $"{order.User.UserName} Ваш заказ {order.Id} на сумму {Math.Round(order.TotalCost, 2)} сформирован {order.Date}";
         await _emailSender.SendEmailAsync(user.Email, "gg", infoOrder);
         await _applicationDbContext.OrderUnits.AddRangeAsync(orderUnits);
         await _applicationDbContext.SaveChangesAsync();
         return Ok(order);
-
     }
-    
 }

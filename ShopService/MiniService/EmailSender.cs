@@ -1,9 +1,5 @@
-using System.Net;
-using System.Net.Mail;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
 using MimeKit;
-using TestJob.Domain.Entity;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace ShopService.MiniService;
