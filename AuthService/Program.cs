@@ -10,12 +10,14 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TestJob.Domain.Context;
 using TestJob.Domain.Entity;
+using TestJob.Domain.MapProfile;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -45,6 +47,7 @@ const string connectionS = "Server=localhost;Database=fr;User=root;Password=0099
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionS
     , new MySqlServerVersion(new Version(8, 0, 34))));
 ;
+
 builder.Services.AddIdentity<User,Role>(options =>
     {
         options.SignIn.RequireConfirmedEmail = true;
@@ -75,7 +78,7 @@ builder.Services.AddAuthentication(options =>
 
 });
 
-
+builder.Services.AddAutoMapper(typeof(InfoUserProfile));
 
 
 var app = builder.Build();

@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "9uNHxRQ+EqX3m0FEViZ1aQBBQuFp4qz7Hp/MfPsHPRvRAoxY9pNvkRko1CbRYUybrgru38SXFR9LCB8+Mp26KA==",
-  "success": false,
+  "dgSpecHash": "gReFFHk26a63OCZbxNKk4w3CvfpEP3rMNBFxfU4gp2QE0CvTzeQDa7GsaJrxpRyIXB+stZy+q3alTDxnARi6Rw==",
+  "success": true,
   "projectFilePath": "D:\\C_Project\\TestJob\\AuthService\\AuthService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dan18\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
+    "C:\\Users\\dan18\\.nuget\\packages\\automapper.collection\\9.0.0\\automapper.collection.9.0.0.nupkg.sha512",
+    "C:\\Users\\dan18\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\dan18\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\dan18\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",
     "C:\\Users\\dan18\\.nuget\\packages\\bouncycastle.cryptography\\2.2.1\\bouncycastle.cryptography.2.2.1.nupkg.sha512",
@@ -111,9 +113,10 @@
   ],
   "logs": [
     {
-      "code": "NU1107",
-      "level": "Error",
-      "message": "Version conflict detected for AutoMapper. Install/reference AutoMapper 12.0.1 directly to project AuthService to resolve this issue. \r\n AuthService -> TestJob.Domain -> AutoMapper (>= 12.0.1) \r\n AuthService -> Microsoft.AspNetCore.ApiAuthorization.IdentityServer 7.0.10 -> Duende.IdentityServer.EntityFramework.Storage 6.0.4 -> AutoMapper (>= 11.0.0 && < 12.0.0).",
+      "code": "NU1608",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Detected package version outside of dependency constraint: Duende.IdentityServer.EntityFramework.Storage 6.0.4 requires AutoMapper (>= 11.0.0 && < 12.0.0) but version AutoMapper 12.0.1 was resolved.",
       "libraryId": "AutoMapper",
       "targetGraphs": [
         "net7.0"

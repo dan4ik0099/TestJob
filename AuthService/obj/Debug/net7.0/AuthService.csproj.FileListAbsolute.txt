@@ -104,3 +104,5 @@ D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\runtimes\win\lib\net7.0\System
 D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.Pkcs.dll
 D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
 D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\AutoMapper.Collection.dll
+D:\C_Project\TestJob\AuthService\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

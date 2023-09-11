@@ -10,16 +10,16 @@ namespace ShopService.MiniService;
 
 public class EmailSender : IEmailSender
 {
-    public async Task SendEmailAsync(string userEmail, string subject, string confirmationLink)
+    public async Task SendEmailAsync(string userEmail, string subject, string body)
     {
-        subject = "ConfirmEmail";
+        subject = "SuccessOrder";
         MimeMessage msg = new MimeMessage();
         msg.From.Add(new MailboxAddress("Dobrin", "dan4ik0099@mail.ru"));
         msg.To.Add(MailboxAddress.Parse(userEmail));
         msg.Subject = subject;
         msg.Body = new TextPart(MimeKit.Text.TextFormat.Html)
         {
-            Text = confirmationLink
+            Text = body
         };
         using (var smtpClient = new SmtpClient())
         {

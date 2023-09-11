@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MySqlConnector;
 using ShopService.MiniService;
 using TestJob.Domain.Context;
 using TestJob.Domain.Entity;
@@ -51,6 +50,15 @@ builder.Services.AddIdentity<User,Role>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders(); 
 builder.Services.AddTransient<EmailSender>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin() // Можно настроить разрешенные источники AllowAnyOrigin, WithOrigins, WithHeaders и другие.
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -59,7 +67,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.Authority = "https://localhost:7144/"; // URL Authorization Server
-    options.Audience = "https://localhost:7096/"; // Аудитория (название ваше
+    options.Audience = "https://localhost:7144/"; // Аудитория (название ваше
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -68,7 +76,7 @@ builder.Services.AddAuthentication(options =>
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = "https://localhost:7144/", 
-                    ValidAudience = "https://localhost:7096/", 
+                    ValidAudience = "https://localhost:7144/", 
                     IssuerSigningKey = new SymmetricSecurityKey("your_secret_key_that_is_long_enoughiahhazsxiogvhoiaigvhopiahgop"u8.ToArray())
     };
 
@@ -83,6 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication(); 
